@@ -4,8 +4,16 @@ const request = require('supertest')
 var {app} = require('./../server')
 var {Todo} = require('./../models/todo')
 
+const todos = [{
+  text: "do this 1"
+}, {
+  text: "do this 2"
+}]
+
 beforeEach((done) => {
-  Todo.remove({}).then(() => done())
+  Todo.remove({}).then(() => {
+    return Todo.insertMany(todos)
+  }).then(() => done())
 })
 
 describe('post calls', () => {
@@ -22,7 +30,7 @@ describe('post calls', () => {
     })
     .end((err, res) => {
       if(err) return done(err)
-      Todo.find().then((doc) => {
+      Todo.find({text}).then((doc) => {
         expect(doc.length).toBe(1)
         expect(doc[0].text).toBe(text)
         done()
@@ -38,9 +46,21 @@ describe('post calls', () => {
     .end((err, res) => {
       if (err) return done(err)
       Todo.find().then((doc) => {
-        expect(doc.length).toBe(0)
+        expect(doc.length).toBe(2)
         done()
       }).catch((e) => done(e))
     })
+  })
+})
+
+describe('GET test', () => {
+  it('should GET all todos', (done) => {
+    request(app)
+    .get('/todos')
+    .expect(200)
+    .expect((res) => {
+      expect(res.body.docs.length).toBe(2)
+    })
+    .end(done)
   })
 })
