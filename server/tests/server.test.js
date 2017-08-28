@@ -1,14 +1,23 @@
 const expect = require('expect')
 const request = require('supertest')
+const {ObjectID} = require('mongodb')
 
 var {app} = require('./../server')
 var {Todo} = require('./../models/todo')
 
 const todos = [{
+  _id: new ObjectID(),
   text: "do this 1"
 }, {
+  _id: new ObjectID(),
   text: "do this 2"
 }]
+
+var id2 = todos[0]._id.toHexString()
+var id3 = id2.replace(/^5/, '6')
+
+var id1 = todos[0]._id.toHexString()
+var id4 = id1 + '11'
 
 beforeEach((done) => {
   Todo.remove({}).then(() => {
@@ -61,6 +70,32 @@ describe('GET test', () => {
     .expect((res) => {
       expect(res.body.docs.length).toBe(2)
     })
+    .end(done)
+  })
+})
+
+describe('GET/:id tests', () => {
+  it('should return todo items', (done) => {
+    request(app)
+    .get(`/todos/${id1}`)
+    .expect(200)
+    .expect((res) => {
+      expect(res.body.todo.text).toBe(todos[0].text)
+    })
+    .end(done)
+  })
+
+  it('should return 404 if no records found', (done) => {
+    request(app)
+    .get(`/todos/${id3}`)
+    .expect(404)
+    .end(done)
+  })
+
+  it('should return 400 if id is invalid', (done) => {
+    request(app)
+    .get(`/todos/${id4}`)
+    .expect(400)
     .end(done)
   })
 })

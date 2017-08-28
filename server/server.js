@@ -32,11 +32,11 @@ app.get('/todos', (req, res) => {
 
 app.get('/todos/:id', (req, res) => {
   var id = req.params.id
-  if (!ObjectID.isValid(id)) return res.status(404).send('id was invalid')
+  if (!ObjectID.isValid(id)) return res.status(400).send('id was invalid')
 
-  Todo.findById(id).then((user) => {
-    if(!user) return res.status(404).send('invalid id was send')
-    res.send({user})
+  Todo.findById(id).then((todo) => {
+    if(!todo) return res.status(404).send('invalid id was send')
+    res.send({todo})
   }, ((e) => res.status(400).send('id was e'))).catch((e) => res.status(400).send())
 
   // res.send(req.params)
