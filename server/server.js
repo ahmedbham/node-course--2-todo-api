@@ -9,6 +9,8 @@ var {ObjectID} = require('mongodb')
 var app = express()
 app.use(bodyParser.json())
 
+const port = process.env.PORT || 3000
+
 app.post('/todos', (req, res) => {
   var todo = new Todo({
     text: req.body.text,
@@ -42,8 +44,8 @@ app.get('/todos/:id', (req, res) => {
   // res.send(req.params)
 })
 
-app.listen(3000, () => {
-  console.log('started on port 3000')
+app.listen(port, () => {
+  console.log(`started on port ${port}`)
 })
 
 module.exports = {app}
