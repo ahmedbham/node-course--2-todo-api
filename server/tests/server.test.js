@@ -99,3 +99,33 @@ describe('GET/:id tests', () => {
     .end(done)
   })
 })
+
+describe('DELETE /todos/:id tests', () => {
+  it('should delete object and return deleted object', (done) => {
+    request(app)
+    .delete(`/todos/${id1}`)
+    .expect(200)
+    .expect((res) => expect(res.body.todo._id).toBe(id1))
+    .end((err, res) => {
+      if(err) return done(err)
+      Todo.findById(id1).then((todo) => {
+        expect(todo).toNotExist()
+        done()
+      }).catch((e) => done(e))
+    })
+  })
+
+  it('should return 404 if not found', (done) => {
+    request(app)
+    .delete(`/todos/${id3}`)
+    .expect(404)
+    .end(done)
+  })
+
+  it('should return 400 if object is invalid', (done) => {
+    request(app)
+    .delete(`/todos/${id4}`)
+    .expect(400)
+    .end(done)
+  })
+})
