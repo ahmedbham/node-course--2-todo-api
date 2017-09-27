@@ -1,6 +1,7 @@
 const _ = require('lodash')
 const express = require('express')
 const bodyParser = require('body-parser')
+const bcrypt= require('bcryptjs')
 
 require('./config/config')
 var {mongoose} = require('./db/mongoose')
@@ -85,6 +86,36 @@ app.post('/users', (req, res) => {
     res.header('x-auth', token).send(user)
   })
   .catch((e) => res.status(400).send(e))
+})
+
+app.post('/users/login', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password'])
+
+  User.findByCredentials(body.email, body.password).then((user) => {
+    return user.generateAuthToken().then((token) => {
+      res.header('x-auth', token).send(user)
+    })
+  }).catch((e) => {
+    res.status(400).send()
+  })
+  // find uer by email
+  // User.findOne({
+  //   email: body.email
+  // }).then((user) => {
+  //   if(user) {
+  //     var hashedPassword = user.password
+  //     bcrypt.compare(body.password, hashedPassword, (err, resp) => {
+  //       if(err || !resp) return res.status(401).send(err)
+  //       var token = user.generateAuthToken()
+  //       res.header('x-auth', token).send({
+  //         email: user.email,
+  //         id: user._id
+  //       })
+  //     })
+  //   } else {
+  //     res.status(401).send()
+  //   }
+  // }, (err) => res.status(401).send())
 })
 
 app.get('/users/me', authenticate, (req, res) => {
