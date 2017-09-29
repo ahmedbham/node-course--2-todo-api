@@ -183,7 +183,7 @@ describe('GET: /users/me: ', () => {
     })
     .end(done)
   })
-  it('should return 401 forunathenticated users', (done) => {
+  it('should return 401 for unathenticated users', (done) => {
     request(app)
     .get('/users/me')
     .expect(401)
@@ -294,5 +294,22 @@ describe('POST /users/login', () => {
           done()
         }).catch((e) => done(e))
       })
+  })
+})
+
+describe('DELETE /users/me/token: ', () => {
+  it('should delete token', (done) => {
+    var email = users[0].email
+    request(app)
+    .delete('/users/me/token')
+    .set('x-auth', users[0].tokens[0].token)
+    .expect(200)
+    .end((err, res) => {
+      if (err) return done(err)
+      User.findOne({email}).then((user) => {
+        expect(user.tokens.length).toBe(0)
+        done()
+      }).catch((e) => done(e))
+    })
   })
 })
