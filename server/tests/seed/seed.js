@@ -20,7 +20,11 @@ tokens: [{
   {
     _id: userTwoId,
     email: 'bhs@yah.com',
-    password: 'userTwoPass'
+    password: 'userTwoPass',
+    tokens: [{
+      access: 'auth',
+      token: jwt.sign({_id: userTwoId, access: 'auth'}, 'abc123').toString()
+    }]
   }
 ]
 
@@ -37,12 +41,14 @@ const populateUsers = (done) => {
 
 const todos = [{
   _id: new ObjectID(),
-  text: "do this 1"
+  text: "do this 1",
+  _creator: userOneId
 }, {
   _id: new ObjectID(),
   text: "do this 2",
   completed: true,
-  completedAt: 444
+  completedAt: 222,
+  _creator: userTwoId
 }]
 
 
